@@ -27,7 +27,7 @@ def getMAC(ip):
     return responsesList[0][1].hwsrc
 
 # Functia spoof profita de vulnerabilitatile de securitate ale protocolului ARP (clientii conectati la retea pot sa accepte un ARP Response fara sa fi trimis vreun request
-# Functia trimite un ARP Response catre tinta in numele clientului cu IP-ul "spoofIP" (op=1 - ARP Request, op=2 - ARP Response)
+# Functia trimite un ARP Response catre tinta in numele clientului cu IP-ul "spoofIP" (op=1 -> ARP Request, op=2 -> ARP Response)
 # Astfel, in ARP Table-ul tintei, adresa MAC reala a clientului cu IP-ul "spoofIP" va fi inlocuita cu adresa MAC a atacatorului (a celui care utilizeaza programul)
 def spoof(targetIP, spoofIP):
     targetMAC = getMAC(targetIP)
@@ -43,7 +43,7 @@ def restoreTable(destinationIP, sourceIP):
 
 # Program principal
 # Pentru ca datele trimise intre tinta si gateway sa poata fi interceptate, disecate si analizate, se va activa port forwarding pe computerul utilizatorului
-# Scopul activarii port forwarding este ca pachetele trimise de tinta catre gatewey si inapoi sa poata circula prin utilizator dupa ce a devenit MITM
+# Scopul activarii port forwarding este ca pachetele trimise de tinta catre gateway si inapoi sa poata circula prin utilizator dupa ce a devenit MITM
 # La fiecare doua secunde, programul "pacaleste" victima ca atacatorul (utilizatorul) este gateway-ul si viceversa
 userInput = getInput()
 print("arpSpoofer on!")
