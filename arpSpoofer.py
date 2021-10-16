@@ -18,7 +18,7 @@ def getInput():
     return arguments
     
 # Functia getMAC trimite o cerere ARP la adresa de broadcast a retelei pentru a afla adresa MAC a unui client a carei adresa IP o cunoastem
-# Metoda srp ne permite sa trimitem pachete si, in acelasi timp, sa accesam setul de raspunsuri primite (contine adresa MAC cautata)
+# Functia srp din librarie ne permite sa trimitem pachete si, in acelasi timp, sa accesam setul de raspunsuri primite (contine adresa MAC cautata)
 def getMAC(ip):
     macHeader = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
     arpRequest = scapy.ARP(pdst=ip)
